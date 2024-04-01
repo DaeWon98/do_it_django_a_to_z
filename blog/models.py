@@ -7,5 +7,6 @@ class Post(models.Model) :
     created_at = models.DateTimeField(auto_now_add=True) # 시간 데이터 기록
     update_at = models.DateTimeField(auto_now=True)
 
+    # 게시글의 PK값과 제목을 반환
     def __str__(self) :
         return f'[{self.pk}] {self.title}'
