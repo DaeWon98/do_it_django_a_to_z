@@ -1,3 +1,11 @@
 from django.db import models
 
-# Create your models here.
+class Post(models.Model) :
+    title = models.CharField(max_length=30) # 문자를 담는 필드 생성 (최대길이 50)
+    content = models.TextField() # 문자열의 길이 제한없는 TextField를 사용해 본문필드 생성
+
+    created_at = models.DateTimeField(auto_now_add=True) # 시간 데이터 기록
+    update_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self) :
+        return f'[{self.pk}] {self.title}'
