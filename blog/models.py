@@ -10,3 +10,6 @@ class Post(models.Model) :
     # 게시글의 PK값과 제목을 반환
     def __str__(self) :
         return f'[{self.pk}] {self.title}'
+
+    def get_absolute_url(self) :
+        return f'blog/{self : pk}/'
