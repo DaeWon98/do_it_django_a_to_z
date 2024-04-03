@@ -3,6 +3,7 @@ import os
 
 class Post(models.Model) :
     title = models.CharField(max_length=30) # 문자를 담는 필드 생성 (최대길이 50)
+    hook_text = models.CharField(max_length=100, blank=True) # 요약문 필드 생성 제한 글자 100 설정
     content = models.TextField() # 문자열의 길이 제한없는 TextField를 사용해 본문필드 생성
 
     head_image = models.ImageField(upload_to='blog/images/%Y/%m/%d/',
