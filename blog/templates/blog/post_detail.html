@@ -7,6 +7,7 @@
           content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+    <script src="https://kit.fontawesome.com/ed3a783848.js" crossorigin="anonymous"></script>
 
     <title>{{ post.title }} - blog</title>
     <!-- bootstrap core CSS -->
@@ -28,17 +29,36 @@
                             <a class="badge bg-secondary text-decoration-none link-light" href="#!">Freebies</a>
                         </header>
                         <!-- Preview image -->
-                        {% if p.head_image %}
-                        <img class="card-img-top" src="{{ p.head_image.url }}" alt="{{p}} head image">
+                        {% if post.head_image %}
+                        <img class="card-img-top" src="{{ p.head_image.url }}" alt="{{post.title}} head_image">
                         {% else %}
-                        <img class="card-img-top" src="https://picsum.phtos/seed/{{ p.id }}800/200"
-                        alt="Random_image">
+                        <img class="img-fluid rounded" src="https://picsum.photos/seed/{{post.id}}"
+                             alt="random_image">
                         {% endif %}
-                        <img class="img-fluid rounded" src="{{ post.head_image.url }}" alt="">
+                        <hr>
                         <!-- Preview image figure-->
                         <figure class="mb-4"><img class="img-fluid rounded" src="https://dummyimage.com/900x400/ced4da/6c757d.jpg" alt="..."></figure>
                         <!-- Post content-->
                         <p>{{ post.content }}</p>
+                        <!-- file download -->
+                        {% if post.file_upload %}
+                        <a class="btn btn-warning" href="{{ post.file_upload.url }}" role="button">
+                            Download :
+                            {% if post.get_file_ext == 'csv'%}
+                            <i class="fa-solid fa-file-csv"></i>
+                            {% elif post.get_file_ext == 'xlsx' or post.get_file_ext == 'xls'%}
+                            <i class="fa-solid fa-file-excel"></i>
+                            {% elif post.get_file_ext == 'docx' or post.get_file_ext == 'doc'%}
+                            <i class="fa-solid fa-file-word"></i>
+                            {% elif post.get_file_ext == 'html'}
+                            <i class="fa-brands fa-html5"></i>
+                            {% else %}
+                            <i class="fa-solid fa-file"></i>
+                            {% endif %}
+                            {{ post.get_file_name }}
+                        </a>
+                        {% endif %}
+                        <hr>
                     </article>
                     <!-- Comments section-->
                     <section class="mb-5">
