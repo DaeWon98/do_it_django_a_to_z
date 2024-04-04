@@ -9,6 +9,9 @@ class Category(models.Model) :
     def __str__(self) :
         return self.name
 
+    def get_absolute_url(self) :
+        return (f'/blog/category/{self.slug}/')
+
     class Meta :
         verbose_name_plural = 'categories'
 
@@ -36,7 +39,7 @@ class Post(models.Model) :
         return f'[{self.pk}] {self.title} :: {self.author}'
 
     def get_absolute_url(self) :
-        return (f'/{self.pk}/')
+        return (f'/blog/{self.pk}/')
 
     def get_file_name(self) :
         return os.path.basename(self.file_upload.name)
