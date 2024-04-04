@@ -2,6 +2,16 @@ from django.db import models
 import os
 from django.contrib.auth.models import User
 
+class Category(models.Model) :
+    name = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=200, unique=True, allow_unicode=True) # 사람이 읽을 수 있는 문자로 고유 URL 생성
+
+    def __str__(self) :
+        return self.name
+
+    class Meta :
+        verbose_name_plural = 'categories'
+
 class Post(models.Model) :
     title = models.CharField(max_length=30) # 문자를 담는 필드 생성 (최대길이 50)
     hook_text = models.CharField(max_length=100, blank=True) # 요약문 필드 생성 제한 글자 100 설정
@@ -17,6 +27,9 @@ class Post(models.Model) :
     update_at = models.DateTimeField(auto_now=True)
 
     author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+
+    category = models.ForeignKey(Category, null=True, blank=True,
+                                 on_delete=models.SET_NULL) # Post모델에 category 필드 추가
 
     # 게시글의 PK값과 제목을 반환
     def __str__(self) :
