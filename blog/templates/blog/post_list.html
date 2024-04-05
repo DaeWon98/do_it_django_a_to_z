@@ -5,6 +5,9 @@
         {% if category %}
         <span class="badge badge-light">{{ category }}</span>
         {% endif %}
+        {% if tag %}
+        <span class="badge badge-light">{{ tag }} ({{ tag.post_set.count }})</span>
+        {% endif %}
     </h1>
     {% if post_list.exists %}
 

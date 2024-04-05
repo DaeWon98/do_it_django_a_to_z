@@ -22,8 +22,8 @@ class Category(models.Model) :
     def get_absolute_url(self) :
         return (f'/blog/category/{self.slug}/')
 
-    class Meta :
-        verbose_name_plural = 'categories'
+class Meta :
+    verbose_name_plural = 'categories'
 
 class Post(models.Model) :
     title = models.CharField(max_length=30) # 문자를 담는 필드 생성 (최대길이 50)
