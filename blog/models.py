@@ -2,6 +2,16 @@ from django.db import models
 import os
 from django.contrib.auth.models import User
 
+class Tag(models.Model) :
+    name = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=200, unique=True, allow_unicode=True) # 사람이 읽을 수 있는 문자로 고유 URL 생성
+
+    def __str__(self) :
+        return self.name
+
+    def get_absolute_url(self) :
+        return (f'/blog/tag/{self.slug}/')
+
 class Category(models.Model) :
     name = models.CharField(max_length=50, unique=True)
     slug = models.SlugField(max_length=200, unique=True, allow_unicode=True) # 사람이 읽을 수 있는 문자로 고유 URL 생성
@@ -33,6 +43,8 @@ class Post(models.Model) :
 
     category = models.ForeignKey(Category, null=True, blank=True,
                                  on_delete=models.SET_NULL) # Post모델에 category 필드 추가
+
+    tags = models.ManyToManyField(Tag, blank=True)  # ManytoMany는 Null 값을 허용하지 않는다.
 
     # 게시글의 PK값과 제목을 반환
     def __str__(self) :
