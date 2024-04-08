@@ -3,12 +3,23 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Post, Category, Tag
 from django.core.exceptions import PermissionDenied
+from django.utils.text import slugify
 
 class PostUpdate(LoginRequiredMixin, UpdateView) :
     model = Post
-    fields = ['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category', 'tags']
+    fields = ['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category']
 
     template_name = 'blog/post_update_form.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(PostCreate, self).get_context_data()
+        if self.object.tags.exists() :
+            tags_str_list = list()
+            for t in self.object.tags.all() :
+                tags_str_list.append(t.name)
+            context['tags_str_default'] = ';'.join(tags_str_list)
+
+        return context
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated and request.user == self.get_object().author :
@@ -16,7 +27,27 @@ class PostUpdate(LoginRequiredMixin, UpdateView) :
         else :
             raise PermissionDenied
 
-class PostList(ListView):
+    def form_valid(self, form) :
+        response = super(PostUpdate, self).form_valid(form)
+        self.object.tags.clear()
+
+        tags_str = self.request.POST.get('tags_str')
+        if tags_str :
+            tags_str = tags_str.stirp()
+            tags_str = tags_str.replace(',', ';')
+            tags_list = tags_str.split(';')
+
+            for t in tags_list :
+                t = t.strip()
+                tag, is_tag_created = Tag.objects.get_or_create(name=t)
+                if is_tag_created :
+                    tag.slug = slugify(t, allow_unicode=True)
+                    tag.save()
+                self.object.tags.add(tag)
+
+        return response
+
+class PostList(ListView) :
     model = Post
     ordering = '-pk'
 
@@ -37,7 +68,7 @@ class PostDetail(DetailView):
         return context
 
 
-class PostCreate(LoginRequiredMixin, UserPassesTestMixin , CreateView):
+class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Post
     fields = ['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category']
 
@@ -48,13 +79,31 @@ class PostCreate(LoginRequiredMixin, UserPassesTestMixin , CreateView):
         current_user = self.request.user
         if current_user.is_authenticated and (current_user.is_superuser or current_user.is_staff):
             form.instance.author = current_user
-            return super(PostCreate, self).form_valid(form)
+            response = super(PostCreate, self).form_valid(form)
+
+            tags_str = self.request.POST.get('tags_str') # 입력한 태그 문자열을 변수에 저장
+            if tags_str :
+                tags_str = tags_str.strip() # 공백 문자 삭제
+
+                tags_str = tags_str.replace(',', ';')  # 쉼표를 세미콜론으로 변경
+                tags_list = tags_str.split(';')  # 세미콜론 기준으로 문자열 분리하여 리스트 변수에 저장
+
+                for t in tags_list :
+                    t = t.strip()  # tags_list의 요소를 공백 제거하여 t에 저장
+                    tag, is_tag_created = Tag.objects.get_or_create(name=t)  # get or create (값 2개 반환)
+                    if is_tag_created :
+                        tag.slug = slugify(t, allow_unicode=True)
+                        tag.save()  # tag를 저장
+                    self.object_tags.add(tag)  # tag를 테이블(필드)에 저장
+
+            return response
+
         else:
             return redirect('/blog/')
 
 
 
-def category_page(request, slug):
+def category_page(request, slug) :
     if slug == 'no_category':
         category = '미분류'
         post_list = Post.objects.filter(category=None)
